@@ -42,15 +42,3 @@ class OCTDataset(Dataset):
                 segmentation = self.transform(segmentation)
 
         return img, segmentation
-
-
-if __name__ == "__main__":
-    root_dir = "C:\\Users\\dmrar\\Desktop\\JHU\\code\\data"
-    transforms = torchvision.transforms.Compose(
-        [torchvision.transforms.ToTensor()])
-    dataset = OCT_dataset(root_dir, transforms)
-    test = dataset[574]
-    print(dataset.seg_paths[574])
-
-    plt.imshow(test['segmentation'].permute(1, 2, 0))
-    plt.show()
