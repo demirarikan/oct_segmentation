@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+import torch.nn.init as init
 
 
 class UNet(nn.Module):
@@ -18,6 +19,8 @@ class UNet(nn.Module):
         self.dec_conv4 = self.deconv_block(32 + 32, 32)
 
         self.output_layer = nn.Conv2d(32, out_channels, kernel_size=1)
+
+        self.initialize_weights()
 
     def conv_block(self, in_channels, out_channels):
         return nn.Sequential(
@@ -66,7 +69,21 @@ class UNet(nn.Module):
 
         output = self.output_layer(dec4)
         # create segmentation map from 5 classes
-        output = F.softmax(output, dim=1)
-        _, output = torch.max(x, dim=1)
+        # output = F.softmax(output, dim=1)
+        # _, output = torch.max(output, dim=1)
+        # output = output.view(output.shape[0], 1, output.shape[1], output.shape[2]).to(dtype=torch.float32)
         
         return output
+    
+    def initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                # Apply Kaiming initialization to linear layers
+                init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                if m.bias is not None:
+                    init.constant_(m.bias, 0) 
+            elif isinstance(m, nn.Conv2d):
+                # Apply Kaiming initialization to convolutional layers
+                init.kaiming_uniform_(m.weight, mode='fan_in', nonlinearity='relu')
+                if m.bias is not None:
+                    init.constant_(m.bias, 0)

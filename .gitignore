@@ -2,3 +2,4 @@ data
 logs
 __pycache__
 oct_seg_model
+oct-seg-env
